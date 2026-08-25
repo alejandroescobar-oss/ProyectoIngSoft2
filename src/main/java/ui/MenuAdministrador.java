@@ -44,9 +44,8 @@ public class MenuAdministrador implements MenuRol {
 
         verUsuarios.setOnAction(event -> {
 
-            GestionUsuariosView vista =
-                    new GestionUsuariosView(
-                            usuario,
+            ListaUsuariosView  vista =
+                    new ListaUsuariosView (
                             usuarioService
                     );
 

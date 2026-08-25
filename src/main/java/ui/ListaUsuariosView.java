@@ -1,4 +1,3 @@
-
 package ui;
 
 import java.util.List;
@@ -19,40 +18,35 @@ import javafx.stage.Stage;
 import model.Usuario;
 import service.UsuarioService;
 
-public class GestionUsuariosView {
+public class ListaUsuariosView {
 
-    private final Usuario usuarioActual;
     private final UsuarioService usuarioService;
 
     private final ObservableList<Usuario> usuarios =
             FXCollections.observableArrayList();
 
-    public GestionUsuariosView(
-            Usuario usuarioActual,
-            UsuarioService usuarioService) {
-
-        this.usuarioActual = usuarioActual;
+    public ListaUsuariosView(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
     public void mostrar(Stage stage) {
 
         Label titulo =
-                new Label("GESTIÓN DE USUARIOS");
+                new Label("LISTA DE USUARIOS");
 
         ListView<Usuario> listaUsuarios =
                 new ListView<>();
 
         listaUsuarios.setItems(usuarios);
 
-        // Cargar todos los usuarios al abrir la ventana
+        // Cargar usuarios al abrir la ventana
         cargarUsuarios();
 
         TextField campoBusqueda =
                 new TextField();
 
         campoBusqueda.setPromptText(
-                "Buscar usuario por nombre..."
+                "Buscar usuario por Login..."
         );
 
         Button buscar =
@@ -61,7 +55,10 @@ public class GestionUsuariosView {
         Button mostrarTodos =
                 new Button("Mostrar todos");
 
-        // BUSCAR POR NOMBRE
+        Button volver =
+                new Button("Volver");
+
+        // BUSCAR
         buscar.setOnAction(event -> {
 
             String texto =
@@ -78,106 +75,14 @@ public class GestionUsuariosView {
             cargarUsuarios();
         });
 
-        Button modificar =
-                new Button("Modificar");
-
-        Button eliminar =
-                new Button("Eliminar");
-
-        Button volver =
-                new Button("Volver");
-
-        // MODIFICAR
-        modificar.setOnAction(event -> {
-
-            Usuario seleccionado =
-                    listaUsuarios.getSelectionModel()
-                            .getSelectedItem();
-
-            if (seleccionado == null) {
-
-                mostrarMensaje(
-                        "Seleccione un usuario.",
-                        Alert.AlertType.WARNING
-                );
-
-                return;
-            }
-
-            EditarUsuarioView editar =
-                    new EditarUsuarioView(
-                            seleccionado,
-                            usuarioService,
-                            this::cargarUsuarios
-                    );
-
-            editar.mostrar(stage);
-        });
-
-        // ELIMINAR
-        eliminar.setOnAction(event -> {
-
-            Usuario seleccionado =
-                    listaUsuarios.getSelectionModel()
-                            .getSelectedItem();
-
-            if (seleccionado == null) {
-
-                mostrarMensaje(
-                        "Seleccione un usuario.",
-                        Alert.AlertType.WARNING
-                );
-
-                return;
-            }
-
-            // Evitar que el administrador se elimine a sí mismo
-            if (seleccionado.getId() ==
-                    usuarioActual.getId()) {
-
-                mostrarMensaje(
-                        "No puede eliminar su propio usuario.",
-                        Alert.AlertType.WARNING
-                );
-
-                return;
-            }
-
-            try {
-
-                usuarioService.eliminarUsuario(
-                        seleccionado.getId()
-                );
-
-                cargarUsuarios();
-
-                mostrarMensaje(
-                        "Usuario eliminado correctamente.",
-                        Alert.AlertType.INFORMATION
-                );
-
-            } catch (Exception e) {
-
-                mostrarMensaje(
-                        "No se pudo eliminar el usuario.",
-                        Alert.AlertType.ERROR
-                );
-            }
-        });
-
         // VOLVER
         volver.setOnAction(event -> {
 
-            DashboardView dashboard =
-                    new DashboardView(
-                            usuarioActual,
-                            usuarioService
-                    );
-
-            dashboard.mostrar(stage);
+            // Aquí puedes colocar la vista a la que quieras regresar.
+            stage.close();
         });
 
-        // Botones de búsqueda
+        // Barra de búsqueda
         HBox busqueda =
                 new HBox(
                         10,
@@ -188,12 +93,10 @@ public class GestionUsuariosView {
 
         busqueda.setAlignment(Pos.CENTER);
 
-        // Botones principales
+        // Botón volver
         HBox botones =
                 new HBox(
                         10,
-                        modificar,
-                        eliminar,
                         volver
                 );
 
@@ -216,7 +119,7 @@ public class GestionUsuariosView {
                 new Scene(root, 700, 500);
 
         stage.setTitle(
-                "Gestión de usuarios"
+                "Lista de usuarios"
         );
 
         stage.setScene(scene);
@@ -224,7 +127,7 @@ public class GestionUsuariosView {
     }
 
     /**
-     * Carga todos los usuarios desde el servicio.
+     * Carga todos los usuarios.
      */
     private void cargarUsuarios() {
 
@@ -239,7 +142,7 @@ public class GestionUsuariosView {
      */
     private void buscarUsuarios(String nombre) {
 
-        // Si el campo está vacío, mostrar todos
+        // Si está vacío, mostrar todos
         if (nombre.isEmpty()) {
 
             cargarUsuarios();
@@ -254,11 +157,11 @@ public class GestionUsuariosView {
 
         for (Usuario usuario : lista) {
 
-            String nombreCompleto =
-                    usuario.getNombreCompleto();
+            String Login =
+                    usuario.getLogin();
 
-            if (nombreCompleto != null &&
-                    nombreCompleto
+            if (Login != null &&
+                    Login
                             .toLowerCase()
                             .contains(nombre.toLowerCase())) {
 
@@ -285,7 +188,7 @@ public class GestionUsuariosView {
                 new Alert(tipo);
 
         alert.setTitle(
-                "Gestión de usuarios"
+                "Lista de usuarios"
         );
 
         alert.setHeaderText(null);
@@ -296,5 +199,4 @@ public class GestionUsuariosView {
 
         alert.showAndWait();
     }
-
 }
