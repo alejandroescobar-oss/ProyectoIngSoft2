@@ -10,7 +10,7 @@ public class DatabaseInitializer {
 
     public static void initialize() {
 
-        String sql = """
+        String usuariosSql = """
                 CREATE TABLE IF NOT EXISTS usuarios (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     login TEXT NOT NULL UNIQUE,
@@ -20,13 +20,24 @@ public class DatabaseInitializer {
                     password_hash TEXT NOT NULL
                 )
                 """;
+        String preguntasSql = """
+                CREATE TABLE IF NOT EXISTS preguntas (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    nombre TEXT NOT NULL,
+                    texto TEXT NOT NULL,
+                    opciones TEXT NOT NULL,
+                    respuesta_correcta INTEGER NOT NULL,
+                    estado TEXT NOT NULL
+                )
+                """;
 
         try (
                 Connection connection = DatabaseConnection.getConnection();
                 Statement statement = connection.createStatement()
         ) {
 
-            statement.execute(sql);
+            statement.execute(usuariosSql);
+            statement.execute(preguntasSql);
 
             System.out.println("Base de datos inicializada correctamente.");
 

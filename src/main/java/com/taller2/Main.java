@@ -1,53 +1,33 @@
 package com.taller2;
 
 import database.DatabaseInitializer;
-import javafx.application.Application;
-import javafx.stage.Stage;
-import repository.UsuarioRepository;
 import repository.UsuarioRepositorySQLite;
 import security.Argon2PasswordHasher;
-import security.PasswordHasher;
 import service.UsuarioService;
-import ui.LoginView;
+import ui.swing.LoginView;
 import validation.PasswordValidator;
 
+import javax.swing.*;
 
-public class Main extends Application {
-
-    @Override
-    public void start(Stage stage) {
-
-        // Inicializar base de datos
+public class Main {
+    public static void main(String[] args) {
+        // 1. Inicializar base de datos (tablas de usuarios y preguntas)
         DatabaseInitializer.initialize();
 
-        // Repository
-        UsuarioRepository repository =
-                new UsuarioRepositorySQLite();
+        // 2. Crear dependencias del servicio de usuarios
+        UsuarioRepositorySQLite usuarioRepository = new UsuarioRepositorySQLite();
+        PasswordValidator passwordValidator = new PasswordValidator();
+        Argon2PasswordHasher passwordHasher = new Argon2PasswordHasher();
+        UsuarioService usuarioService = new UsuarioService(
+                usuarioRepository,
+                passwordValidator,
+                passwordHasher
+        );
 
-        // Validación de contraseña
-        PasswordValidator passwordValidator =
-                new PasswordValidator();
-
-        // Hashing
-        PasswordHasher passwordHasher =
-                new Argon2PasswordHasher();
-
-        // Servicio
-        UsuarioService usuarioService =
-                new UsuarioService(
-                        repository,
-                        passwordValidator,
-                        passwordHasher
-                );
-
-        // Mostrar Login
-        LoginView loginView =
-                new LoginView(usuarioService);
-
-        loginView.mostrar(stage);
-    }
-
-    public static void main(String[] args) {
-        launch();
+        // 3. Lanzar la vista de Login en Swing (asegura que se ejecute en el hilo de eventos)
+        SwingUtilities.invokeLater(() -> {
+            LoginView loginView = new LoginView(usuarioService);
+            loginView.setVisible(true);   // Método de JFrame
+        });
     }
 }
