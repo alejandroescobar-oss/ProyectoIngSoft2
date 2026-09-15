@@ -1,4 +1,7 @@
 package core.model;
 
-public class NivelDificultad {
+public enum NivelDificultad {
+    BASICO,
+    INTERMEDIO,
+    AVANZADO
 }

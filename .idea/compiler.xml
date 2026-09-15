@@ -9,5 +9,10 @@
         <module name="taller2-solid" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="generador-multimedia" target="25" />
+      <module name="generador-multiple" target="25" />
+      <module name="importador-excel" target="25" />
+    </bytecodeTargetLevel>
   </component>
 </project>

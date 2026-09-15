@@ -1,15 +1,60 @@
 # File Tree: ProyectoIngSoft2
 
-**Generated:** 9/15/2026, 2:16:41 PM
+**Generated:** 9/15/2026, 5:13:31 PM
 **Root Path:** `d:\universidad\6_Semestre\Lab_Ing_Software_2\ProyectoIngSoft2`
 
 ```
+├── plugins
+│   ├── generadorMultimedia
+│   │   ├── src
+│   │   │   └── main
+│   │   │       └── java
+│   │   │           └── com
+│   │   │               └── taller2
+│   │   │                   └── plugins
+│   │   │                       └── GeneradorPreguntaMultimedia.java
+│   │   └── pom.xml
+│   ├── generadorMultiple
+│   │   ├── src
+│   │   │   └── main
+│   │   │       └── java
+│   │   │           └── com
+│   │   │               └── taller2
+│   │   │                   └── plugins
+│   │   │                       └── GeneradorPreguntasSeleccionMultiple.java
+│   │   └── pom.xml
+│   └── importadorExcel
+│       ├── src
+│       │   └── main
+│       │       └── java
+│       │           └── com
+│       │               └── taller2
+│       │                   └── plugins
+│       │                       └── ImportadorPreguntasExcel.java
+│       └── pom.xml
 ├── src
 │   ├── main
 │   │   ├── java
 │   │   │   ├── com
 │   │   │   │   └── taller2
 │   │   │   │       └── Main.java
+│   │   │   ├── core
+│   │   │   │   ├── contracts
+│   │   │   │   │   ├── Filter.java
+│   │   │   │   │   ├── Pipeline.java
+│   │   │   │   │   ├── Plugin.java
+│   │   │   │   │   └── PluginContext.java
+│   │   │   │   ├── model
+│   │   │   │   │   ├── Competencia.java
+│   │   │   │   │   ├── NivelDificultad.java
+│   │   │   │   │   ├── PreguntaNueva.java
+│   │   │   │   │   └── ResultadoPipeline.java
+│   │   │   │   ├── BancoPreguntas.java
+│   │   │   │   ├── DefaultPluginContext.java
+│   │   │   │   ├── Kernel.java
+│   │   │   │   ├── LifecycleManager.java
+│   │   │   │   ├── PluginLoader.java
+│   │   │   │   └── PluginRegistry.java
 │   │   │   ├── database
 │   │   │   │   ├── DatabaseConnection.java
 │   │   │   │   └── DatabaseInitializer.java
@@ -19,6 +64,14 @@
 │   │   │   │   ├── QuestionStatus.java
 │   │   │   │   ├── Rol.java
 │   │   │   │   └── Usuario.java
+│   │   │   ├── pipeline
+│   │   │   │   ├── filters
+│   │   │   │   │   ├── ClassificationFilter.java
+│   │   │   │   │   ├── ContentValidationFilter.java
+│   │   │   │   │   ├── CorrectAnswerValidatorFilter.java
+│   │   │   │   │   └── OptionsValidatorFilter.java
+│   │   │   │   ├── PipelineContext.java
+│   │   │   │   └── PipelineImpl.java
 │   │   │   ├── repository
 │   │   │   │   ├── QuestionRepository.java
 │   │   │   │   ├── QuestionRepositorySQLite.java
@@ -38,13 +91,19 @@
 │   │   │   │       ├── ListaUsuariosView.java
 │   │   │   │       ├── LoginView.java
 │   │   │   │       ├── PieChartView.java
+│   │   │   │       ├── PluginExecutionView.java
 │   │   │   │       ├── PreguntasView.java
 │   │   │   │       ├── RegistroView.java
 │   │   │   │       └── StatisticsView.java
 │   │   │   └── validation
 │   │   │       └── PasswordValidator.java
 │   │   └── resources
-│   │       └── fxml
+│   │       ├── fxml
+│   │       └── plugins.properties
+│   ├── plugins
+│   │   ├── generadorMultimedia
+│   │   ├── generadorMultiple
+│   │   └── importadorExcel
 │   └── test
 │       └── java
 │           ├── repository
@@ -57,6 +116,7 @@
 │               └── PasswordValidatorTest.java
 ├── .gitignore
 ├── Three.md
+├── plugins.properties
 └── pom.xml
 ```
 

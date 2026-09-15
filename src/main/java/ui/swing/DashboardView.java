@@ -1,5 +1,6 @@
 package ui.swing;
 
+import core.Kernel;
 import model.Usuario;
 import repository.QuestionRepositorySQLite;
 import service.QuestionService;
@@ -14,10 +15,16 @@ import java.awt.GridLayout;
 public class DashboardView extends JFrame {
     private final Usuario usuario;
     private final UsuarioService usuarioService;
+    private final Kernel kernel;
 
     public DashboardView(Usuario usuario, UsuarioService usuarioService) {
+        this(usuario, usuarioService, null);
+    }
+
+    public DashboardView(Usuario usuario, UsuarioService usuarioService, Kernel kernel) {
         this.usuario = usuario;
         this.usuarioService = usuarioService;
+        this.kernel = kernel;
         initComponents();
     }
 
@@ -33,6 +40,12 @@ public class DashboardView extends JFrame {
                 new QuestionService(new QuestionRepositorySQLite())).setVisible(true));
         panel.add(preguntas);
 
+        if (kernel != null) {
+            JButton plugins = new JButton("Ejecutar plugin");
+            plugins.addActionListener(e -> new PluginExecutionView(kernel).setVisible(true));
+            panel.add(plugins);
+        }
+
         if (usuario.getRol() == model.Rol.ADMINISTRADOR) {
             JButton usuarios = new JButton("Gestionar usuarios");
             usuarios.addActionListener(e -> new GestionUsuariosView(usuarioService).setVisible(true));
@@ -41,7 +54,7 @@ public class DashboardView extends JFrame {
 
         JButton cerrar = new JButton("Cerrar sesión");
         cerrar.addActionListener(e -> {
-            new LoginView(usuarioService).setVisible(true);
+            new LoginView(usuarioService, kernel).setVisible(true);
             dispose();
         });
         panel.add(cerrar);
