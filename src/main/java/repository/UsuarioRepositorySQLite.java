@@ -1,7 +1,6 @@
 package repository;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,16 +11,22 @@ import java.util.Optional;
 import model.EstadoUsuario;
 import model.Rol;
 import model.Usuario;
+import database.ConnectionProvider;
+import database.SQLiteConnectionProvider;
 
 public class UsuarioRepositorySQLite implements UsuarioRepository {
-    private final String databaseUrl;
+    private final ConnectionProvider connectionProvider;
 
-        public UsuarioRepositorySQLite() {
-        this.databaseUrl = "jdbc:sqlite:taller2.db";
+    public UsuarioRepositorySQLite() {
+        this(new SQLiteConnectionProvider());
     }
 
     public UsuarioRepositorySQLite(String databaseUrl) {
-        this.databaseUrl = databaseUrl;
+        this(new SQLiteConnectionProvider(databaseUrl));
+    }
+
+    public UsuarioRepositorySQLite(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
     }
     
     @Override
@@ -34,7 +39,7 @@ public class UsuarioRepositorySQLite implements UsuarioRepository {
                 """;
 
         try (
-                Connection connection = DriverManager.getConnection(databaseUrl);
+                Connection connection = connectionProvider.getConnection();
                 PreparedStatement statement =
                         connection.prepareStatement(sql)
         ) {
@@ -71,7 +76,7 @@ public class UsuarioRepositorySQLite implements UsuarioRepository {
                 """;
 
         try (
-                Connection connection = DriverManager.getConnection(databaseUrl);
+                Connection connection = connectionProvider.getConnection();
                 PreparedStatement statement =
                         connection.prepareStatement(sql)
         ) {
@@ -124,7 +129,7 @@ public class UsuarioRepositorySQLite implements UsuarioRepository {
                 """;
 
         try (
-                Connection connection = DriverManager.getConnection(databaseUrl);
+                Connection connection = connectionProvider.getConnection();
                 PreparedStatement statement =
                         connection.prepareStatement(sql);
                 ResultSet resultSet = statement.executeQuery()
@@ -167,7 +172,7 @@ public class UsuarioRepositorySQLite implements UsuarioRepository {
                 """;
 
         try (
-                Connection connection = DriverManager.getConnection(databaseUrl);
+                Connection connection = connectionProvider.getConnection();
                 PreparedStatement statement =
                         connection.prepareStatement(sql)
         ) {
@@ -200,7 +205,7 @@ public class UsuarioRepositorySQLite implements UsuarioRepository {
             """;
 
          try (
-            Connection connection = DriverManager.getConnection(databaseUrl);
+            Connection connection = connectionProvider.getConnection();
             PreparedStatement statement =
                     connection.prepareStatement(sql)
          ) {
@@ -231,7 +236,7 @@ public void eliminar(int id) {
             """;
 
     try (
-            Connection connection = DriverManager.getConnection(databaseUrl);
+            Connection connection = connectionProvider.getConnection();
             PreparedStatement statement =
                     connection.prepareStatement(sql)
     ) {

@@ -3,7 +3,9 @@ package com.taller2;
 import database.DatabaseInitializer;
 import core.Kernel;
 import repository.UsuarioRepositorySQLite;
+import repository.QuestionRepositorySQLite;
 import security.Argon2PasswordHasher;
+import service.QuestionService;
 import service.UsuarioService;
 import ui.swing.LoginView;
 import validation.PasswordValidator;
@@ -26,10 +28,11 @@ public class Main {
                 passwordValidator,
                 passwordHasher
         );
+        QuestionService questionService = new QuestionService(new QuestionRepositorySQLite());
 
         // 3. Lanzar la vista de Login en Swing (asegura que se ejecute en el hilo de eventos)
         SwingUtilities.invokeLater(() -> {
-            LoginView loginView = new LoginView(usuarioService, kernel);
+            LoginView loginView = new LoginView(usuarioService, questionService, kernel);
             loginView.setVisible(true);   // Método de JFrame
         });
     }

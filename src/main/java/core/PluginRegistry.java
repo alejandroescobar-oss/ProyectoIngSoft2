@@ -1,27 +1,32 @@
 package core;
 
-import core.contracts.Plugin;
-import core.contracts.PluginContext;
+import core.contracts.QuestionPlugin;
+import core.contracts.PluginCatalog;
 
 import java.util.*;
-public class PluginRegistry {
-    private final Map<String, Plugin> plugins = new LinkedHashMap<>();
-    private final PluginContext context;
+public class PluginRegistry implements PluginCatalog {
+    private final Map<String, QuestionPlugin> plugins = new LinkedHashMap<>();
 
-    public PluginRegistry(PluginContext context) { this.context = context; }
-
-    public void registrar(Plugin p) {
-        if (plugins.containsKey(p.getId()))
-            throw new IllegalStateException("Plugin duplicado: " + p.getId());
-        p.inicializar(context);
-        plugins.put(p.getId(), p);
+    @Override
+    public void register(QuestionPlugin plugin) {
+        if (plugins.containsKey(plugin.getName())) {
+            throw new IllegalStateException("Plugin duplicado: " + plugin.getName());
+        }
+        plugins.put(plugin.getName(), plugin);
     }
 
-    public void desregistrar(String id) {
-        Plugin p = plugins.remove(id);
-        if (p != null) p.detener();
+    @Override
+    public void unregister(String name) {
+        plugins.remove(name);
     }
 
-    public Collection<Plugin> listar() { return plugins.values(); }
-    public Plugin obtener(String id) { return plugins.get(id); }
+    @Override
+    public Collection<QuestionPlugin> list() { return List.copyOf(plugins.values()); }
+    @Override
+    public QuestionPlugin find(String name) { return plugins.get(name); }
+
+    public void registrar(QuestionPlugin plugin) { register(plugin); }
+    public void desregistrar(String name) { unregister(name); }
+    public Collection<QuestionPlugin> listar() { return list(); }
+    public QuestionPlugin obtener(String name) { return find(name); }
 }

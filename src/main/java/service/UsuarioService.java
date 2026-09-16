@@ -6,17 +6,17 @@ import model.EstadoUsuario;
 import model.Usuario;
 import repository.UsuarioRepository;
 import security.PasswordHasher;
-import validation.PasswordValidator;
+import validation.PasswordPolicy;
 
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final PasswordValidator passwordValidator;
+    private final PasswordPolicy passwordValidator;
     private final PasswordHasher passwordHasher;
 
     public UsuarioService(
             UsuarioRepository usuarioRepository,
-            PasswordValidator passwordValidator,
+            PasswordPolicy passwordValidator,
             PasswordHasher passwordHasher
     ) {
         this.usuarioRepository = usuarioRepository;

@@ -1,7 +1,8 @@
 package validation;
 
-public class PasswordValidator {
+public class PasswordValidator implements PasswordPolicy {
 
+    @Override
     public boolean esValida(String password) {
 
         if (password == null || password.length() < 6) {

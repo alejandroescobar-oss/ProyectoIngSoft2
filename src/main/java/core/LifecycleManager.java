@@ -1,40 +1,36 @@
 package core;
 
-import core.contracts.Plugin;
-import core.model.PreguntaNueva;
-import core.model.ResultadoPipeline;
+import core.contracts.QuestionPlugin;
+import core.contracts.PluginCatalog;
+import core.contracts.PluginSource;
 
 public class LifecycleManager {
-    private final PluginLoader loader;
-    private final PluginRegistry registry;
+    private final PluginSource loader;
+    private final PluginCatalog registry;
 
-    public LifecycleManager(PluginLoader loader, PluginRegistry registry) {
+    public LifecycleManager(PluginSource loader, PluginCatalog registry) {
         this.loader = loader;
         this.registry = registry;
     }
 
     public void iniciar(String properties) {
-        for (Plugin plugin : loader.cargarTodos(properties)) {
+        for (QuestionPlugin plugin : loader.load(properties)) {
             try {
-                registry.registrar(plugin);
+                registry.register(plugin);
             } catch (RuntimeException exception) {
                 System.err.println("No se pudo registrar el plugin "
-                        + plugin.getId() + ": " + exception.getMessage());
+                        + plugin.getName() + ": " + exception.getMessage());
             }
         }
     }
 
-    public ResultadoPipeline ejecutar(String pluginId, PreguntaNueva entrada) {
-        Plugin p = registry.obtener(pluginId);
-        if (p == null) throw new IllegalArgumentException("Plugin no registrado: " + pluginId);
-        return p.ejecutar(entrada);
-    }
-
     public void detener(String pluginId) {
-        registry.desregistrar(pluginId);
+        registry.unregister(pluginId);
     }
 
-    public java.util.Collection<Plugin> listarPlugins() {
-        return registry.listar();
+    public QuestionPlugin obtener(String name) { return registry.find(name); }
+
+    public java.util.Collection<QuestionPlugin> listarPlugins() {
+        return registry.list();
     }
 }

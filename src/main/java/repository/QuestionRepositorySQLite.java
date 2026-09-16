@@ -2,9 +2,10 @@ package repository;
 
 import model.Question;
 import model.QuestionStatus;
+import database.ConnectionProvider;
+import database.SQLiteConnectionProvider;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,14 +15,18 @@ import java.util.List;
 import java.util.Optional;
 
 public class QuestionRepositorySQLite implements QuestionRepository {
-    private final String databaseUrl;
+    private final ConnectionProvider connectionProvider;
 
     public QuestionRepositorySQLite() {
-        this("jdbc:sqlite:taller2.db");
+        this(new SQLiteConnectionProvider());
     }
 
     public QuestionRepositorySQLite(String databaseUrl) {
-        this.databaseUrl = databaseUrl;
+        this(new SQLiteConnectionProvider(databaseUrl));
+    }
+
+    public QuestionRepositorySQLite(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
     }
 
     @Override
@@ -31,7 +36,7 @@ public class QuestionRepositorySQLite implements QuestionRepository {
                 (nombre, texto, opciones, respuesta_correcta, estado)
                 VALUES (?, ?, ?, ?, ?)
                 """;
-        try (Connection connection = DriverManager.getConnection(databaseUrl);
+        try (Connection connection = connectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, question.getNombre());
             statement.setString(2, question.getTexto());
@@ -48,7 +53,7 @@ public class QuestionRepositorySQLite implements QuestionRepository {
     public Optional<Question> buscarPorId(int id) {
         String sql = "SELECT id, nombre, texto, opciones, respuesta_correcta, estado " +
                 "FROM preguntas WHERE id = ?";
-        try (Connection connection = DriverManager.getConnection(databaseUrl);
+        try (Connection connection = connectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -70,7 +75,7 @@ public class QuestionRepositorySQLite implements QuestionRepository {
     public List<Question> listarPorEstado(QuestionStatus estado) {
         String sql = "SELECT id, nombre, texto, opciones, respuesta_correcta, estado " +
                 "FROM preguntas WHERE estado = ?";
-        try (Connection connection = DriverManager.getConnection(databaseUrl);
+        try (Connection connection = connectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, estado.name());
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -91,7 +96,7 @@ public class QuestionRepositorySQLite implements QuestionRepository {
                 UPDATE preguntas SET nombre = ?, texto = ?, opciones = ?,
                 respuesta_correcta = ?, estado = ? WHERE id = ?
                 """;
-        try (Connection connection = DriverManager.getConnection(databaseUrl);
+        try (Connection connection = connectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, question.getNombre());
             statement.setString(2, question.getTexto());
@@ -107,7 +112,7 @@ public class QuestionRepositorySQLite implements QuestionRepository {
 
     @Override
     public void eliminar(int id) {
-        try (Connection connection = DriverManager.getConnection(databaseUrl);
+        try (Connection connection = connectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "DELETE FROM preguntas WHERE id = ?")) {
             statement.setInt(1, id);
@@ -118,7 +123,7 @@ public class QuestionRepositorySQLite implements QuestionRepository {
     }
 
     private List<Question> listar(String sql) {
-        try (Connection connection = DriverManager.getConnection(databaseUrl);
+        try (Connection connection = connectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
             List<Question> questions = new ArrayList<>();

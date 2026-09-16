@@ -2,7 +2,6 @@ package ui.swing;
 
 import core.Kernel;
 import model.Usuario;
-import repository.QuestionRepositorySQLite;
 import service.QuestionService;
 import service.UsuarioService;
 
@@ -15,15 +14,22 @@ import java.awt.GridLayout;
 public class DashboardView extends JFrame {
     private final Usuario usuario;
     private final UsuarioService usuarioService;
+    private final QuestionService questionService;
     private final Kernel kernel;
 
     public DashboardView(Usuario usuario, UsuarioService usuarioService) {
-        this(usuario, usuarioService, null);
+        this(usuario, usuarioService, new QuestionService(new repository.QuestionRepositorySQLite()), null);
     }
 
     public DashboardView(Usuario usuario, UsuarioService usuarioService, Kernel kernel) {
+        this(usuario, usuarioService, new QuestionService(new repository.QuestionRepositorySQLite()), kernel);
+    }
+
+    public DashboardView(Usuario usuario, UsuarioService usuarioService,
+                         QuestionService questionService, Kernel kernel) {
         this.usuario = usuario;
         this.usuarioService = usuarioService;
+        this.questionService = questionService;
         this.kernel = kernel;
         initComponents();
     }
@@ -36,8 +42,7 @@ public class DashboardView extends JFrame {
         panel.add(new JLabel("Rol: " + usuario.getRol()));
 
         JButton preguntas = new JButton("Banco de preguntas");
-        preguntas.addActionListener(e -> new PreguntasView(
-                new QuestionService(new QuestionRepositorySQLite())).setVisible(true));
+        preguntas.addActionListener(e -> new PreguntasView(questionService).setVisible(true));
         panel.add(preguntas);
 
         if (kernel != null) {

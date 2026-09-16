@@ -2,6 +2,8 @@ package ui.swing;
 
 import core.Kernel;
 import model.Usuario;
+import repository.QuestionRepositorySQLite;
+import service.QuestionService;
 import service.UsuarioService;
 
 import javax.swing.BorderFactory;
@@ -18,16 +20,22 @@ import java.awt.Insets;
 
 public class LoginView extends JFrame {
     private final UsuarioService usuarioService;
+    private final QuestionService questionService;
     private final Kernel kernel;
     private final JTextField loginField = new JTextField(20);
     private final JPasswordField passwordField = new JPasswordField(20);
 
     public LoginView(UsuarioService usuarioService) {
-        this(usuarioService, null);
+        this(usuarioService, new QuestionService(new QuestionRepositorySQLite()), null);
     }
 
     public LoginView(UsuarioService usuarioService, Kernel kernel) {
+        this(usuarioService, new QuestionService(new QuestionRepositorySQLite()), kernel);
+    }
+
+    public LoginView(UsuarioService usuarioService, QuestionService questionService, Kernel kernel) {
         this.usuarioService = usuarioService;
+        this.questionService = questionService;
         this.kernel = kernel;
         initComponents();
     }
@@ -78,7 +86,7 @@ public class LoginView extends JFrame {
             Usuario usuario = usuarioService.iniciarSesion(
                     loginField.getText().trim(),
                     new String(passwordField.getPassword()));
-            new DashboardView(usuario, usuarioService, kernel).setVisible(true);
+            new DashboardView(usuario, usuarioService, questionService, kernel).setVisible(true);
             dispose();
         } catch (IllegalArgumentException exception) {
             JOptionPane.showMessageDialog(this, exception.getMessage(),
