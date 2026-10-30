@@ -24,7 +24,12 @@ public class PreguntaNueva {
     public List<String> getOpciones() { return new ArrayList<>(opciones); }
     public int getRespuestaCorrecta() { return respuestaCorrecta; }
 
+    /**
+     * Convierte esta entrada en una pregunta de dominio en estado de borrador.
+     *
+     * @return pregunta correspondiente en estado de borrador
+     */
     public Question comoQuestion() {
-        return new Question(nombre, texto, opciones, respuestaCorrecta, QuestionStatus.PENDIENTE_REVISION);
+        return new Question(nombre, texto, opciones, respuestaCorrecta, QuestionStatus.BORRADOR);
     }
 }

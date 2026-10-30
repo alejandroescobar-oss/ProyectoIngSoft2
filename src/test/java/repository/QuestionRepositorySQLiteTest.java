@@ -58,4 +58,16 @@ class QuestionRepositorySQLiteTest {
         assertTrue(repository.listarPorEstado(QuestionStatus.BORRADOR).isEmpty());
         assertEquals(1, repository.listarPorEstado(QuestionStatus.PENDIENTE_REVISION).size());
     }
+
+    @Test
+    void debeArchivarSinEliminarLaPregunta() {
+        repository.guardar(new Question("Pregunta", "Texto",
+                List.of("Sí", "No"), 0, QuestionStatus.BORRADOR));
+        int id = repository.listarTodas().get(0).getId();
+
+        repository.archivar(id);
+
+        assertEquals(1, repository.listarTodas().size());
+        assertEquals(QuestionStatus.ARCHIVADA, repository.buscarPorId(id).orElseThrow().getEstado());
+    }
 }

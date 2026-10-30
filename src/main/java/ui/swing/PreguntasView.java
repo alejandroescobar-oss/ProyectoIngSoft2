@@ -113,6 +113,7 @@ public class PreguntasView extends JFrame {
     private void cargarPreguntaSeleccionada() {
         Question question = (Question) questions.getSelectedItem();
         if (question == null) return;
+        status.setEnabled(true);
         id.setText(String.valueOf(question.getId()));
         name.setText(question.getNombre());
         text.setText(question.getTexto());
@@ -123,6 +124,7 @@ public class PreguntasView extends JFrame {
 
     private void limpiarFormulario() {
         questions.setSelectedItem(null);
+        status.setEnabled(false);
         id.setText("");
         name.setText("");
         text.setText("");
@@ -141,6 +143,10 @@ public class PreguntasView extends JFrame {
         return new ArrayList<>(Arrays.asList(options.getText().split("\\|", -1)));
     }
 
+    /**
+     * Crea una pregunta en estado de borrador; los cambios de ciclo de vida
+     * se realizan mediante la acción de actualización de estado.
+     */
     private void guardar() {
         try {
             List<String> questionOptions = leerOpciones();
@@ -152,8 +158,7 @@ public class PreguntasView extends JFrame {
                     ? (Integer) correctOption.getSelectedItem() : 0;
             actualizarOpcionesCorrectas(questionOptions.size(), selectedOption);
             service.guardar(new Question(name.getText().trim(), text.getText().trim(),
-                    questionOptions, (Integer) correctOption.getSelectedItem(),
-                    (QuestionStatus) status.getSelectedItem()));
+                    questionOptions, (Integer) correctOption.getSelectedItem(), QuestionStatus.BORRADOR));
             cargarPreguntas();
             JOptionPane.showMessageDialog(this, "Pregunta guardada correctamente.");
         } catch (RuntimeException exception) {
@@ -162,14 +167,23 @@ public class PreguntasView extends JFrame {
         }
     }
 
+    /**
+     * Solicita al servicio aplicar el estado seleccionado según las reglas
+     * del ciclo de vida.
+     */
     private void actualizarEstado() {
         Question question = (Question) questions.getSelectedItem();
         if (question == null) {
             JOptionPane.showMessageDialog(this, "Seleccione una pregunta.");
             return;
         }
-        service.cambiarEstado(question, (QuestionStatus) status.getSelectedItem());
-        cargarPreguntas();
-        JOptionPane.showMessageDialog(this, "Estado actualizado.");
+        try {
+            service.cambiarEstado(question, (QuestionStatus) status.getSelectedItem());
+            cargarPreguntas();
+            JOptionPane.showMessageDialog(this, "Estado actualizado.");
+        } catch (IllegalArgumentException exception) {
+            JOptionPane.showMessageDialog(this, exception.getMessage(), "Transición no permitida",
+                    JOptionPane.WARNING_MESSAGE);
+        }
     }
 }

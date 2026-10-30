@@ -24,11 +24,17 @@ public class PieChartView extends JPanel implements PropertyChangeListener {
         add(chartPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Construye el gráfico de distribución a partir del conteo actual
+     * de preguntas por estado.
+     *
+     * @return gráfico con una sección para cada estado del ciclo de vida
+     */
     private JFreeChart crearGrafico() {
         DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-        dataset.setValue("Borrador", service.listarPorEstado(QuestionStatus.BORRADOR).size());
-        dataset.setValue("Pendiente revisión", service.listarPorEstado(QuestionStatus.PENDIENTE_REVISION).size());
-        dataset.setValue("Eliminada", service.listarPorEstado(QuestionStatus.ELIMINADA).size());
+        for (QuestionStatus status : QuestionStatus.values()) {
+            dataset.setValue(status.getDisplayName(), service.listarPorEstado(status).size());
+        }
         return ChartFactory.createPieChart("Distribución de preguntas", dataset, true, true, false);
     }
 

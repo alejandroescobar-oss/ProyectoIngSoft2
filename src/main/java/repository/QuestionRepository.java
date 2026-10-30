@@ -11,6 +11,11 @@ public interface QuestionRepository {
     Optional<Question> buscarPorId(int id);
     List<Question> listarTodas();
     void actualizar(Question question);
-    void eliminar(int id);
+    /**
+     * Archiva una pregunta sin eliminar físicamente su registro.
+     *
+     * @param id identificador de la pregunta que se va a archivar
+     */
+    void archivar(int id);
     List<Question> listarPorEstado(QuestionStatus estado);
 }

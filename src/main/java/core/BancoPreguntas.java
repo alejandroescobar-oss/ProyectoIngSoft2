@@ -13,15 +13,27 @@ public class BancoPreguntas {
     public BancoPreguntas() {
         this.repositorio = new QuestionRepositorySQLite();
     }
+
     public BancoPreguntas(QuestionRepository r) { this.repositorio = r; }
 
     public void almacenar(Question q)              { repositorio.guardar(q); }
 
+    /**
+     * Convierte una pregunta generada al modelo de dominio en estado de borrador.
+     *
+     * @param question pregunta generada que se va a almacenar
+     */
     public void almacenar(core.model.Question question) {
         almacenar(question, new core.model.QuestionRequest(
                 question.getTitle(), question.getContent(), question.getType()));
     }
 
+    /**
+     * Convierte y almacena una pregunta generada como borrador.
+     *
+     * @param question pregunta producida por un complemento
+     * @param request datos de entrada y opciones de respuesta de la pregunta
+     */
     public void almacenar(core.model.Question question,
                           core.model.QuestionRequest request) {
         if (question == null) {
@@ -32,11 +44,16 @@ public class BancoPreguntas {
                 question.getContent(),
                 request.getOptions(),
                 request.getCorrectAnswer(),
-                QuestionStatus.PENDIENTE_REVISION
+                QuestionStatus.BORRADOR
         ));
     }
 
     public List<Question> listarTodas()            { return repositorio.listarTodas(); }
     public void actualizar(Question q)             { repositorio.actualizar(q); }
-    public void eliminar(int id)                   { repositorio.eliminar(id); }
+    /**
+     * Archiva una pregunta conservando su registro en la base de datos.
+     *
+     * @param id identificador de la pregunta que se va a archivar
+     */
+    public void archivar(int id)                   { repositorio.archivar(id); }
 }

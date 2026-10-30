@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class QuestionServiceTest {
     @Test
@@ -31,6 +32,32 @@ class QuestionServiceTest {
         assertEquals(QuestionStatus.PENDIENTE_REVISION, events.get(0).getNewValue());
     }
 
+    @Test
+    void debeRechazarTransicionesNoPermitidas() {
+        MemoryRepository repository = new MemoryRepository();
+        Question question = new Question(1, "Pregunta", "Texto",
+                List.of("A", "B"), 0, QuestionStatus.BORRADOR);
+        QuestionService service = new QuestionService(repository);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.cambiarEstado(question, QuestionStatus.PUBLICADA));
+        assertEquals(QuestionStatus.BORRADOR, question.getEstado());
+    }
+
+    @Test
+    void debeArchivarSinEliminarElRegistro() {
+        MemoryRepository repository = new MemoryRepository();
+        Question question = new Question(1, "Pregunta", "Texto",
+                List.of("A", "B"), 0, QuestionStatus.BORRADOR);
+        repository.questions.add(question);
+        QuestionService service = new QuestionService(repository);
+
+        service.archivar(1);
+
+        assertEquals(1, repository.questions.size());
+        assertEquals(QuestionStatus.ARCHIVADA, repository.questions.get(0).getEstado());
+    }
+
     private static class MemoryRepository implements QuestionRepository {
         private final List<Question> questions = new ArrayList<>();
 
@@ -40,7 +67,10 @@ class QuestionServiceTest {
         }
         public List<Question> listarTodas() { return questions; }
         public void actualizar(Question question) { }
-        public void eliminar(int id) { questions.removeIf(q -> q.getId() == id); }
+        public void archivar(int id) {
+            questions.stream().filter(q -> q.getId() == id)
+                    .forEach(q -> q.setEstado(QuestionStatus.ARCHIVADA));
+        }
         public List<Question> listarPorEstado(QuestionStatus status) {
             return questions.stream().filter(q -> q.getEstado() == status).toList();
         }

@@ -10,6 +10,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class StatisticsView extends JPanel implements PropertyChangeListener {
     private final QuestionService service;
@@ -23,15 +24,20 @@ public class StatisticsView extends JPanel implements PropertyChangeListener {
         actualizarEstadisticas();
     }
 
+    /**
+     * Actualiza el conteo de preguntas correspondiente a cada estado
+     * del ciclo de vida.
+     */
     private void actualizarEstadisticas() {
         Map<QuestionStatus, Integer> counts = new EnumMap<>(QuestionStatus.class);
         for (QuestionStatus status : QuestionStatus.values()) {
             counts.put(status, service.listarPorEstado(status).size());
         }
-        statsLabel.setText(String.format("<html>Borrador: %d<br>Pendiente revisión: %d<br>Eliminada: %d</html>",
-                counts.get(QuestionStatus.BORRADOR),
-                counts.get(QuestionStatus.PENDIENTE_REVISION),
-                counts.get(QuestionStatus.ELIMINADA)));
+        StringJoiner lines = new StringJoiner("<br>", "<html>", "</html>");
+        for (QuestionStatus status : QuestionStatus.values()) {
+            lines.add(status.getDisplayName() + ": " + counts.get(status));
+        }
+        statsLabel.setText(lines.toString());
     }
 
     @Override

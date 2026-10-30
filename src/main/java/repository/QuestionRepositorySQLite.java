@@ -111,14 +111,15 @@ public class QuestionRepositorySQLite implements QuestionRepository {
     }
 
     @Override
-    public void eliminar(int id) {
+    public void archivar(int id) {
         try (Connection connection = connectionProvider.getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "DELETE FROM preguntas WHERE id = ?")) {
-            statement.setInt(1, id);
+                     "UPDATE preguntas SET estado = ? WHERE id = ?")) {
+            statement.setString(1, QuestionStatus.ARCHIVADA.name());
+            statement.setInt(2, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Error al eliminar pregunta.", e);
+            throw new RuntimeException("Error al archivar pregunta.", e);
         }
     }
 
