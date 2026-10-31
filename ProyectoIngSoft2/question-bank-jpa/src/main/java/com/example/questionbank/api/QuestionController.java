@@ -51,6 +51,13 @@ public class QuestionController {
     public List<QuestionResponse> publishedByCompetency(@RequestParam Long competencyId) {
         return questions.listPublishedByCompetency(competencyId).stream().map(QuestionResponse::from).toList();
     }
+    /** Reclassifies a draft question by replacing its topic and competencies. */
+    @PutMapping("/{id}/classification")
+    public QuestionResponse reclassify(@PathVariable Long id,
+                                        @Valid @RequestBody QuestionClassificationRequest request) {
+        return QuestionResponse.from(questions.reclassify(id, request.authorId(),
+                request.topicId(), request.competencyIds()));
+    }
     /** Submits a valid draft for review. */
     @PostMapping("/{id}/submit")
     public QuestionResponse submit(@PathVariable Long id) { return QuestionResponse.from(questions.submitForReview(id)); }

@@ -46,6 +46,16 @@ public class QuestionService {
                 authorId, topicId, competencyIds, metadata, expectedAnswer));
     }
 
+    /** Reclassifies a draft question on behalf of its author. */
+    public Question reclassify(Long id, Long authorId, Long topicId, Set<Long> competencyIds) {
+        requireUser(authorId, Role.AUTHOR);
+        requireTopic(topicId);
+        requireCompetencies(competencyIds);
+        Question question = findQuestion(id);
+        question.reclassify(authorId, topicId, competencyIds);
+        return questions.save(question);
+    }
+
     /** Returns one question or signals that it does not exist. */
     @Transactional(readOnly = true)
     public Question get(Long id) { return findQuestion(id); }

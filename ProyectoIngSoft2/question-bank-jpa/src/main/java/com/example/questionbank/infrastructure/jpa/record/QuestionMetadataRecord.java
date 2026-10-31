@@ -27,10 +27,16 @@ public class QuestionMetadataRecord {
     }
     /** @return cognitive level */
     public String getCognitiveLevel() { return cognitiveLevel; }
+    /** Updates the cognitive level. */
+    public void setCognitiveLevel(String cognitiveLevel) { this.cognitiveLevel = cognitiveLevel; }
     /** @return estimated response time */
     public Integer getEstimatedMinutes() { return estimatedMinutes; }
+    /** Updates the estimated response time. */
+    public void setEstimatedMinutes(Integer estimatedMinutes) { this.estimatedMinutes = estimatedMinutes; }
     /** @return editorial notes */
     public String getEditorialNotes() { return editorialNotes; }
+    /** Updates the editorial notes. */
+    public void setEditorialNotes(String editorialNotes) { this.editorialNotes = editorialNotes; }
     /** Sets the question owning this metadata. */
     public void setQuestion(QuestionRecord question) { this.question = question; }
 }

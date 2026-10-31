@@ -47,8 +47,12 @@ public abstract class QuestionRecord {
     public Long getId() { return id; }
     /** @return question statement */
     public String getStatement() { return statement; }
+    /** Updates the persisted question statement. */
+    public void setStatement(String statement) { this.statement = statement; }
     /** @return question difficulty */
     public Difficulty getDifficulty() { return difficulty; }
+    /** Updates the persisted question difficulty. */
+    public void setDifficulty(Difficulty difficulty) { this.difficulty = difficulty; }
     /** @return lifecycle state */
     public QuestionStatus getStatus() { return status; }
     /** Sets the lifecycle state after a domain transition. */
@@ -57,8 +61,15 @@ public abstract class QuestionRecord {
     public UserRecord getAuthor() { return author; }
     /** @return topic record */
     public TopicRecord getTopic() { return topic; }
+    /** Updates the topic association. */
+    public void setTopic(TopicRecord topic) { this.topic = topic; }
     /** @return competency records */
     public Set<CompetencyRecord> getCompetencies() { return competencies; }
+    /** Replaces the competency associations. */
+    public void setCompetencies(Set<CompetencyRecord> competencies) {
+        this.competencies.clear();
+        this.competencies.addAll(competencies);
+    }
     /** @return optional metadata record */
     public QuestionMetadataRecord getMetadata() { return metadata; }
     /** Sets the metadata and its owning relationship. */

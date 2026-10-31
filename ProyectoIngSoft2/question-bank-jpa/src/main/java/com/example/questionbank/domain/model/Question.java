@@ -72,7 +72,7 @@ public abstract class Question {
         if (status != QuestionStatus.DRAFT) {
             throw new IllegalStateException("Only questions in DRAFT status can be modified");
         }
-        if (editorId != null && !authorId.equals(editorId)) {
+        if (!authorId.equals(editorId)) {
             throw new IllegalArgumentException("Only the author can modify this question");
         }
     }

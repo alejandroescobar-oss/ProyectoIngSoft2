@@ -7,10 +7,10 @@ Independent Spring Boot implementation for Taller 10. The original Swing/SQLite 
 - JDK 17+
 - Maven 3.8+
 
-From PowerShell:
+From the repository root, in PowerShell:
 
 ```powershell
-Set-Location .\question-bank-jpa
+Set-Location .\ProyectoIngSoft2\question-bank-jpa
 mvn test
 mvn spring-boot:run
 ```
@@ -31,7 +31,7 @@ infrastructure/jpa/repository/ Spring Data interfaces
 
 Application services depend on domain repository contracts, never Spring Data interfaces. Domain classes do not import `jakarta.persistence`; `QuestionMapper` converts between domain questions and the separate `JOINED` JPA hierarchy. This is a layered application, not a ports-and-adapters implementation.
 
-The four required association types are demonstrated: one-to-one question metadata (`question_id` unique in `question_metadata`), one-to-many answer options (FK in `answer_options`), many-to-one question author (FK in `questions`), and many-to-many question competencies (`question_competencies`). The question hierarchy uses `JOINED`: common fields in `questions`, subtype data in `multiple_choice_questions` and `true_false_questions`. Questions require a `User` with role `AUTHOR`, a topic and at least one competency. A multiple-choice draft can be edited while incomplete, but must have exactly five options and one correct answer to enter review. Only `PUBLISHED` questions can enter a quiz. A rejection returns a question to `DRAFT` and is stored in `question_reviews`.
+The four required association types are demonstrated: one-to-one question metadata (`question_id` unique in `question_metadata`), one-to-many answer options (FK in `answer_options`), many-to-one question author (FK in `questions`), and many-to-many question competencies (`question_competencies`). The question hierarchy uses `JOINED`: common fields in `questions`, subtype data in `multiple_choice_questions` and `true_false_questions`. Questions require a `User` with role `AUTHOR`, a topic and at least one competency. An incomplete multiple-choice question can be saved as a draft, but it must have exactly five options and one correct answer to enter review. Only `PUBLISHED` questions can enter a quiz. A rejection returns a question to `DRAFT` and is stored in `question_reviews`.
 
 ## API walkthrough (PowerShell)
 
@@ -65,6 +65,7 @@ $questionBody = @{
   )
 }
 $question = Invoke-RestMethod -Method Post -Uri "$base/questions/multiple-choice" -ContentType 'application/json' -Body ($questionBody | ConvertTo-Json -Depth 5)
+Invoke-RestMethod -Method Put -Uri "$base/questions/$($question.id)/classification" -ContentType 'application/json' -Body (@{authorId=$author.id; topicId=$topic.id; competencyIds=@($competency.id)} | ConvertTo-Json)
 Invoke-RestMethod -Method Post -Uri "$base/questions/$($question.id)/submit"
 Invoke-RestMethod -Method Post -Uri "$base/questions/$($question.id)/start-review?reviewerId=$($reviewer.id)"
 Invoke-RestMethod -Method Post -Uri "$base/questions/$($question.id)/review" -ContentType 'application/json' -Body (@{reviewerId=$reviewer.id; decision='APPROVED'; comments='Approved'} | ConvertTo-Json)
@@ -77,8 +78,8 @@ Create a quiz with the now-published question:
 Invoke-RestMethod -Method Post -Uri "$base/quizzes" -ContentType 'application/json' -Body (@{title='Architecture practice'; teacherId=$teacher.id; questionIds=@($question.id)} | ConvertTo-Json)
 ```
 
-Other operations: `POST /api/questions/true-false`, `GET /api/questions`, `GET /api/questions/{id}`, `GET /api/questions?authorId={id}`, `GET /api/questions?status=PUBLISHED`, `GET /api/questions/published?competencyId={id}`, and `POST /api/questions/{id}/archive`. Invalid input returns 400, missing resources 404, and invalid state transitions 409.
+Other operations: `POST /api/questions/true-false`, `PUT /api/questions/{id}/classification` (draft author only), `GET /api/questions`, `GET /api/questions/{id}`, `GET /api/questions?authorId={id}`, `GET /api/questions?status=PUBLISHED`, `GET /api/questions/published?competencyId={id}`, and `POST /api/questions/{id}/archive`. Invalid input returns 400, missing resources 404, and invalid state transitions 409.
 
 ## Verification
 
-Run `mvn test`. `QuestionBankPersistenceTest` starts Spring with H2 and exercises `JOINED` subtype recovery, metadata/options/competency associations, review persistence, valid lifecycle transitions, incomplete-option rejection, and preventing drafts from entering quizzes.
+Run `mvn clean test`. `QuestionBankPersistenceTest` starts Spring with H2 and exercises `JOINED` subtype recovery, metadata/options/competency associations, review persistence, draft reclassification, valid lifecycle transitions, incomplete-option rejection, and preventing drafts from entering quizzes. `QuestionRepositoryContractTest` checks the application against an in-memory repository implementation without starting JPA; `QuestionLifecycleTest` tests domain transitions directly.

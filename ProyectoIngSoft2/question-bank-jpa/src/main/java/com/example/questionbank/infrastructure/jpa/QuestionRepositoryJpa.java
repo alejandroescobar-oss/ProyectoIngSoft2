@@ -1,6 +1,7 @@
 package com.example.questionbank.infrastructure.jpa;
 
 import com.example.questionbank.domain.model.Question;
+import com.example.questionbank.domain.model.QuestionMetadata;
 import com.example.questionbank.domain.model.QuestionStatus;
 import com.example.questionbank.domain.repository.QuestionRepository;
 import com.example.questionbank.infrastructure.jpa.record.*;
@@ -40,7 +41,24 @@ public class QuestionRepositoryJpa implements QuestionRepository {
                     : question instanceof com.example.questionbank.domain.model.TrueFalseQuestion
                         && existing instanceof TrueFalseQuestionRecord;
             if (!matchingType) throw new IllegalArgumentException("A persisted question cannot change its type");
+            existing.setStatement(question.getStatement());
+            existing.setDifficulty(question.getDifficulty());
             existing.setStatus(question.getStatus());
+            existing.setTopic(topics.getReferenceById(question.getTopicId()));
+            existing.setCompetencies(competencies.findAllById(question.getCompetencyIds())
+                    .stream().collect(Collectors.toSet()));
+            QuestionMetadata metadata = question.getMetadata();
+            QuestionMetadataRecord metadataRecord = existing.getMetadata();
+            if (metadata == null) {
+                existing.setMetadata(null);
+            } else if (metadataRecord == null) {
+                existing.setMetadata(new QuestionMetadataRecord(metadata.cognitiveLevel(),
+                        metadata.estimatedMinutes(), metadata.editorialNotes()));
+            } else {
+                metadataRecord.setCognitiveLevel(metadata.cognitiveLevel());
+                metadataRecord.setEstimatedMinutes(metadata.estimatedMinutes());
+                metadataRecord.setEditorialNotes(metadata.editorialNotes());
+            }
             return QuestionMapper.toDomain(existing);
         }
         UserRecord author = users.getReferenceById(question.getAuthorId());
