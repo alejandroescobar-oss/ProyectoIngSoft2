@@ -8,9 +8,9 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Verifies lifecycle rules using only domain objects, without starting JPA. */
-class QuestionLifecycleTest {
+public class QuestionLifecycleTest {
     @Test
-    void allowsReviewRejectionAndResubmissionButRejectsInvalidTransitions() {
+    public void allowsReviewRejectionAndResubmissionButRejectsInvalidTransitions() {
         TrueFalseQuestion question = new TrueFalseQuestion(null, "Example statement", Difficulty.EASY,
                 QuestionStatus.DRAFT, 1L, 2L, Set.of(3L), null, true);
 

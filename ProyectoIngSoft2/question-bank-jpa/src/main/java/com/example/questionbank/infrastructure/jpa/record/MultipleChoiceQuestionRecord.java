@@ -11,7 +11,7 @@ import java.util.List;
 @Table(name = "multiple_choice_questions")
 public class MultipleChoiceQuestionRecord extends QuestionRecord {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderColumn(name = "option_order")
+    @OrderBy("id ASC")
     private List<AnswerOptionRecord> options = new ArrayList<>();
 
     protected MultipleChoiceQuestionRecord() { }

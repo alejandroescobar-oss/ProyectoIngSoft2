@@ -17,7 +17,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Integration checks for JPA mappings and question workflow rules using H2. */
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Transactional
 class QuestionBankPersistenceTest {
     @Autowired private CatalogService catalog;

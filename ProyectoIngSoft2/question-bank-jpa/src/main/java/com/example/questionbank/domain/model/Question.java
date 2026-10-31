@@ -5,13 +5,13 @@ import java.util.Set;
 /** Persistence-independent base model for all question types. */
 public abstract class Question {
     private final Long id;
-    private final String statement;
-    private final Difficulty difficulty;
+    private String statement;
+    private Difficulty difficulty;
     private QuestionStatus status;
     private final Long authorId;
-    private final Long topicId;
-    private final Set<Long> competencyIds;
-    private final QuestionMetadata metadata;
+    private Long topicId;
+    private Set<Long> competencyIds;
+    private QuestionMetadata metadata;
 
     /** Creates a question with its business classification and current state. */
     protected Question(Long id, String statement, Difficulty difficulty, QuestionStatus status, Long authorId,
@@ -45,6 +45,37 @@ public abstract class Question {
     public Set<Long> getCompetencyIds() { return competencyIds; }
     /** @return optional editorial metadata */
     public QuestionMetadata getMetadata() { return metadata; }
+
+    /** Edits the statement, difficulty and metadata of a draft question by its author. */
+    public void edit(Long editorId, String statement, Difficulty difficulty, QuestionMetadata metadata) {
+        verifyDraftAndAuthor(editorId);
+        if (statement == null || statement.isBlank()) throw new IllegalArgumentException("Statement is required");
+        if (difficulty == null) throw new IllegalArgumentException("Difficulty is required");
+        this.statement = statement;
+        this.difficulty = difficulty;
+        this.metadata = metadata;
+    }
+
+    /** Reclassifies the topic and competencies of a draft question by its author. */
+    public void reclassify(Long editorId, Long newTopicId, Set<Long> newCompetencyIds) {
+        verifyDraftAndAuthor(editorId);
+        if (newTopicId == null) throw new IllegalArgumentException("Topic is required");
+        if (newCompetencyIds == null || newCompetencyIds.isEmpty()) {
+            throw new IllegalArgumentException("At least one competency is required");
+        }
+        this.topicId = newTopicId;
+        this.competencyIds = Set.copyOf(newCompetencyIds);
+    }
+
+    /** Validates that the question is in DRAFT state and the user is the original author. */
+    protected void verifyDraftAndAuthor(Long editorId) {
+        if (status != QuestionStatus.DRAFT) {
+            throw new IllegalStateException("Only questions in DRAFT status can be modified");
+        }
+        if (editorId != null && !authorId.equals(editorId)) {
+            throw new IllegalArgumentException("Only the author can modify this question");
+        }
+    }
 
     /** Moves a draft to the review queue after application validation. */
     public void submitForReview() { transition(QuestionStatus.DRAFT, QuestionStatus.PENDING_REVIEW); }
