@@ -22,4 +22,17 @@ public class QuestionLifecycleTest {
         assertEquals(QuestionStatus.PENDING_REVIEW, question.getStatus());
         assertThrows(IllegalStateException.class, question::publish);
     }
+
+    @Test
+    public void restrictsDraftReclassificationToItsOriginalAuthor() {
+        TrueFalseQuestion question = new TrueFalseQuestion(null, "Example statement", Difficulty.EASY,
+                QuestionStatus.DRAFT, 1L, 2L, Set.of(3L), null, true);
+
+        assertThrows(IllegalArgumentException.class, () -> question.reclassify(null, 4L, Set.of(5L)));
+        assertThrows(IllegalArgumentException.class, () -> question.reclassify(9L, 4L, Set.of(5L)));
+        question.reclassify(1L, 4L, Set.of(5L));
+
+        assertEquals(4L, question.getTopicId());
+        assertEquals(Set.of(5L), question.getCompetencyIds());
+    }
 }

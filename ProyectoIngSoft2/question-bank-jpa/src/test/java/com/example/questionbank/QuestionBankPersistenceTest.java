@@ -111,6 +111,24 @@ class QuestionBankPersistenceTest {
                 Difficulty.EASY, authorId, topicId, Set.of(999L), null, true));
     }
 
+    @Test
+    void reclassifiesDraftAndPersistsTheChangedAssociations() {
+        Long otherTopicId = catalog.createTopic("Data Engineering").id();
+        Long otherCompetencyId = catalog.createCompetency("Problem Analysis").id();
+        Question question = questions.createTrueFalse("A repository hides storage details.", Difficulty.EASY,
+                authorId, topicId, Set.of(competencyId), null, true);
+
+        Question reclassified = questions.reclassify(question.getId(), authorId, otherTopicId,
+                Set.of(otherCompetencyId));
+        Question loaded = questions.get(question.getId());
+
+        assertEquals(otherTopicId, reclassified.getTopicId());
+        assertEquals(otherTopicId, loaded.getTopicId());
+        assertEquals(Set.of(otherCompetencyId), loaded.getCompetencyIds());
+        assertThrows(IllegalArgumentException.class, () -> questions.reclassify(question.getId(),
+                reviewerId, topicId, Set.of(competencyId)));
+    }
+
     private static List<AnswerOption> validOptions() {
         return List.of(new AnswerOption(null, "Separation of concerns", true),
                 new AnswerOption(null, "Global mutable state", false),
